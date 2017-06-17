@@ -1,43 +1,48 @@
 (function (){
-	var arrImg = [];//图片数组
-	var time = 300; //总时间（毫秒）
-	var delay = 10;//时间间隔
-	init();//初始化
-	m_banner();
-	function m_banner(){
-		var left1 = 0;
-		var left2 = 100;
-		var tem = time/delay;//一张图片轮播需要运行多少次
-		var x = 100/tem;//每过10毫秒需要滑动x px;
-		run(left1,left2,x,tem);
+	function Banner(imgs,opts){
+		this.imgs = imgs;
+		this.opts = $.extend({},Banner.DEFAULT,opts);
+		this.run();
 	}
-	function run(left1,left2,x,tem){
-	var point = setInterval(function(){
-			left1-=x;
-			left2-=x;
-			arrImg[0].style.left = left1+"%";
-			arrImg[1].style.left = left2+"%";
-			if(left2<=x){
+
+	Banner.DEFAULT = {
+		time: 300,		  //一张图片切换的总时间
+		residence: 1000 //一张图片切换之后停留的时间
+	}
+	Banner.prototype.run = function(){
+		var img_first_left = 0;
+		var img_second_left = 100;
+		var x = 1//每滑动 1px 所需要的毫秒数;
+		var freq = 100/x; //一张图片轮播需要运行多少次
+		var interval = this.opts.time / freq;
+		var next = (function(){
+			console.log(x)
+			img_first_left-=x;
+			img_second_left-=x;
+			this.imgs[0].style.left = img_first_left+"%";
+			this.imgs[1].style.left = img_second_left+"%";
+			if(img_second_left == 0){
 				change();//改变图片位置
 				clearInterval(point);
-				setTimeout(function(){m_banner()},1000);
-				
+				setTimeout((function(){this.run()}).bind(this),this.opts.residence);
 			}
-	},10);
+		}).bind(this) //纠正this指向
+		var point = setInterval(next,interval);
+
+		change = (function(){
+			temp = this.imgs[0];
+			this.imgs[0] = this.imgs[1];
+			this.imgs[1] = this.imgs[2];
+			this.imgs[2] = temp;
+		}).bind(this)
 	}
 
-	function init(){
-		console.log('初始化');
-		$('#wrapper img').each(function (a,b){
-			 arrImg[a] = b;
-		})
-	}
-	function change(){
-		temp = arrImg[0];
-		arrImg[0] = arrImg[1];
-		arrImg[1] = arrImg[2];
-		arrImg[2] = temp;
-	}
+	// 暴露接口banner
+	$.extend({
+		banner: function(imgs,opts){
+			new Banner(imgs,opts);
+		}
+	})
 
-}())
+})()
 

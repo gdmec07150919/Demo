@@ -3,6 +3,7 @@
 	function Preload(imgs, options) {
 		this.imgs = (typeof imgs === 'string') ? [imgs] : imgs;
 		this.opts = $.extend({}, Preload.DEFAULTS, options)
+	
 		switch(this.opts.type){
 			case 1: {
 				this._unoredered();
