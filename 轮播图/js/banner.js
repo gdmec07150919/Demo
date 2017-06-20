@@ -4,7 +4,6 @@
 		this.opts = $.extend({},Banner.DEFAULT,opts);
 		this.run();
 	}
-
 	Banner.DEFAULT = {
 		time: 300,		  //一张图片切换的总时间
 		residence: 1000 //一张图片切换之后停留的时间
