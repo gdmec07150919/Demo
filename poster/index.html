@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>画廊</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<style>
+	*{padding:0;margin:0;}
+	body{background-color: #fff;color:#555;font-family: 'Avenir Next','Lantinghei SC';font-size: 14px;-webkit-font-smoothing: antialiased;}
+
+	.wrap{
+		width:100%;
+		height: 600px;
+		position:absolute;
+		top:50%;
+		margin-top:-300px;
+		background-color: #333;
+		overflow: hidden;
+		-webkit-perspective:800px;
+	}
+
+	/**海报**/
+	.photo{
+		width:260px;
+		height: 320px;
+		position:absolute;
+		top:50%;
+		left:50%;
+		box-shadow: 0 0 1px rgba(0,0,0,.01);
+		-webkit-transition:all .5s;
+
+	}
+	.photo .side{
+		width: 100%;
+		height: 100%;
+		background-color: #eee;
+		position:absolute;
+		top:0;
+		right: 0;
+		padding:20px;
+		box-sizing: border-box;
+	}
+	.photo .side-front{
+
+	}
+	.photo .side-front .image{
+			width:100%;
+			height:250px;
+			line-height:250px;
+			overflow:hidden;
+
+	}
+	.photo .side-front .image img{
+			width:100%;
+	}
+	.photo .side-front .caption{
+		text-align:center;
+		font-size: 16px;
+		line-height: 50px;
+	}
+	
+	.photo .side-back{
+		
+	}
+	.photo .side-back .desc{
+		color:#666;
+		font-size:14px;
+		line-height: 1.5em;
+	}
+
+	/**当前选中的图片**/
+	.photo_center{
+		width:260px;
+		height: 320px;
+		left:50%;
+		top:50%;
+		margin:-160px 0 0 -130px;
+		z-index: 999;
+
+	}
+	/**翻转**/
+	.photo-wrap{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		-webkit-transition: all .6s;
+		-webkit-transform-style:preserve-3d;
+	}
+	.photo-wrap .side-front{
+		-webkit-transform:rotateY(0deg);
+	}
+	.photo-wrap .side-back{
+		-webkit-transform:rotateY(180deg);
+	}
+	.photo-wrap .side{
+		-webkit-backface-visibility: hidden;
+	}
+	.photo_front .photo-wrap{
+		-webkit-transform:rotateY(0deg);
+	}
+	.photo_back .photo-wrap{
+		-webkit-transform:rotateY(180deg);
+	}
+</style>
+</head>
+<body onselectstart="return false;">
+    <div class="wrap">
+
+
+		<!--平移、旋转-->
+		<div class="photo photo_front" onclick="turn(this)" id="{{index}}">
+			<!--翻转-->
+			<div class="photo-wrap">
+				<div class="side side-front">
+					<p class="image"><img src="{{img}}"></p>
+					<p class="caption">{{caption}}</p>
+				</div>
+				<div class="side side-back">
+					<p class="desc">{{desc}}</p>
+				</div>
+			</div>
+		</div>
+    </div>
+    <script src="data.js"></script>
+    <script type="text/javascript">
+    function g(selector){
+    	var method = selector.substr(0,1) == '.'? 'getElementsByClassName' : 'getElementById';
+    	return document[method](selector.substr(1));
+    }
+
+    /**
+     * rand数组
+	 */
+    function random(rand){
+    	var max = Math.max(rand[0],rand[1]);
+    	var min = Math.min(rand[0],rand[1]);
+    	var diff = max - min; // [1,5]  5-1 = 4
+    	var r = Math.random();
+    	var part = (diff+1);
+    	var splitNum = 1/part;
+    	if(r <= 1-splitNum && r >= splitNum){
+    		return Math.ceil(r*diff)+min;
+    	}else if(r > 1-splitNum){
+    		return max;
+    	}else{
+    		return min;
+    	}
+
+    }
+
+    function range(){
+    	var wrap = {
+    		left:{},
+    		right:{}
+    	}
+    	var photo = {
+
+    	}
+    }
+
+    function rsort(n){
+    	//排序
+    	var _photos = g('.photo');
+    	var photos = [];
+    	var sortedPhotos = [];
+    	//_photos转换为数组
+    	for(var i = 0;i<_photos.length;i++){
+    		photos.push(_photos[i])
+    	}
+    	//开始排序
+    	while(photos.length > 0){
+    		sortedPhotos.push(photos.splice(random([0,photos.length-1]),1)[0])
+    	}
+    	global_photos = sortedPhotos;
+
+    	//设置中心图片
+    	sortedPhotos.splice(n-1,1)[0].className += ' photo_center';
+    	var leftSort1 = sortedPhotos.splice(0,sortedPhotos.length/2);
+    	for(s in leftSort1){
+    		var temp = {
+    			photo: leftSort1[s],
+    			where: 'left'
+    		}
+    		setPosition(temp)
+    	}
+
+    	for(s in sortedPhotos){
+    		var temp = {
+    			photo: sortedPhotos[s],
+    			where: 'right'
+    		}
+    		setPosition(temp)
+    	}
+
+    }
+    function setPosition(e){
+    	console.log(e)
+    	e.photo.style.left = '0px';
+    	e.photo.style.top =  '0px';
+    	e.photo.style.left = range(e.where).x+'px';
+    	e.photo.style.top =  range(e.where).y+'px';
+    	e.photo.style['-webkit-transform'] = 'rotate('+random([-145,145])+'deg)'
+
+    }
+    function range(where){
+    	var wrap = g('.wrap')[0];//总宽高
+    	var photo = g('.photo')[0];
+    	var clientWidth = wrap.clientWidth;
+    	var clientHeight = wrap.clientHeight;
+    	var photoWidth = photo.clientWidth;
+    	var photoHeight = photo.clientHeight;
+    	if(where == 'left'){
+    		var x = random([0,clientWidth/2-photoWidth]);
+    		var y = random([0,clientHeight-photoHeight]);
+    		return ({x:x,y:y})
+    	}else{
+   			var x = random([clientWidth/2,clientWidth-photoWidth]);
+    		var y = random([0,clientHeight-photoHeight]);
+    		return  ({x:x,y:y})
+    	}
+    }
+
+
+    function add(){
+    	var template = g('.wrap')[0].innerHTML;
+    	var html = [];
+
+    	for(s in data){
+    		_html = template.replace('{{img}}',data[s].img)
+    				.replace('{{index}}','photo_'+(parseInt(s)+1))
+    				.replace('{{caption}}',data[s].caption)
+    				.replace('{{desc}}',data[s].desc);
+    		html.push(_html);
+    	}
+    	g('.wrap')[0].innerHTML = html.join('');
+    }
+
+
+    	//1.翻面控制
+    	function turn(elem){
+    		var cls = elem.className;
+    		if(/photo_front/.test(cls)){
+    			cls = cls.replace(/photo_front/,'photo_back')
+    			console.log(cls)
+    		}else{
+  				cls = cls.replace(/photo_back/,'photo_front')
+    		}
+    		return elem.className = cls;
+    	}
+
+    		var global_photos;
+    		add();
+    		var randomCenter = random([1,data.length]);
+    		console.log(randomCenter)
+    		setInterval(()=>{
+    			turn(g('.photo_center')[0])
+    		},1500)
+    	    rsort(randomCenter)
+    </script>
+</body>
+</html>
