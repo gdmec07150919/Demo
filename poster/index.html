@@ -181,30 +181,43 @@
     	for(s in leftSort1){
     		var temp = {
     			photo: leftSort1[s],
-    			where: 'left'
+    			where: 'left',
+                shape: 'circle' //形状
     		}
-    		setPosition(temp)
+    		setCirclePosition(temp)
     	}
 
     	for(s in sortedPhotos){
     		var temp = {
     			photo: sortedPhotos[s],
-    			where: 'right'
+    			where: 'right',
+                shape: 'circle' //形状
     		}
-    		setPosition(temp)
+    		setCirclePosition(temp)
     	}
 
     }
     function setPosition(e){
-    	console.log(e)
     	e.photo.style.left = '0px';
     	e.photo.style.top =  '0px';
     	e.photo.style.left = range(e.where).x+'px';
     	e.photo.style.top =  range(e.where).y+'px';
-    	e.photo.style['-webkit-transform'] = 'rotate('+random([-145,145])+'deg)'
+    	e.photo.style['-webkit-transform'] = 'rotate('+random([-60,60])+'deg)'
+
+    }
+
+    /**
+     *设置圆形范围
+    */
+    function setCirclePosition(e){
+        e.photo.style.left = '45%';
+        e.photo.style.top =  '45%';
+        e.photo.style.left = rangeCircle(e).x+'px';
+        e.photo.style.top =  rangeCircle(e).y+'px';
 
     }
     function range(where){
+        var where = e.where;
     	var wrap = g('.wrap')[0];//总宽高
     	var photo = g('.photo')[0];
     	var clientWidth = wrap.clientWidth;
@@ -220,6 +233,25 @@
     		var y = random([0,clientHeight-photoHeight]);
     		return  ({x:x,y:y})
     	}
+    }
+    function rangeCircle(e){
+        var where = e.where;
+        var R = 300;// 半径
+        var wrap = g('.wrap')[0];// 总宽高
+        var photo = g('.photo')[0];
+        var clientWidth = wrap.clientWidth;
+        var clientHeight = wrap.clientHeight;
+        var x0 = clientWidth/2;// 圆心x坐标
+        var y0 = clientHeight/2;// 圆心y坐标
+            var x = random([x0-R,x0+R]);
+            var y =  (where == 'left') ? (y0-Math.sqrt(R*R-(x-x0)*(x-x0))) : (y0+Math.sqrt(R*R-(x-x0)*(x-x0)))
+         //   console.log(Math.sqrt((R-x+x0)*(R-x-x0))+' y'+'--x0 '+x0+ ' R '+R+' x ')
+
+            console.log(Math.sqrt(R*R-(x-x0)*(x-x0)) + '  '+(R*R-(x-x0)*(x-x0)) + ' x- x0= '+(x-x0)+' 范围 '+(x0-R)+'-'+(x0+R))
+            var angle = Math.atan((y-y0)/(x-x0))*180/Math.PI;
+            console.log(angle)
+            e.photo.style['-webkit-transform'] = 'rotate('+angle+'deg)';
+            return ({x:x,y:y})
     }
 
 
@@ -243,21 +275,29 @@
     		var cls = elem.className;
     		if(/photo_front/.test(cls)){
     			cls = cls.replace(/photo_front/,'photo_back')
-    			console.log(cls)
     		}else{
   				cls = cls.replace(/photo_back/,'photo_front')
     		}
     		return elem.className = cls;
     	}
 
+        // 图片随机移动
+        function imgMove(){
+
+            
+        }
+
+        function animation(e){
+
+        }
     		var global_photos;
     		add();
     		var randomCenter = random([1,data.length]);
-    		console.log(randomCenter)
     		setInterval(()=>{
     			turn(g('.photo_center')[0])
     		},1500)
     	    rsort(randomCenter)
+            imgMove();
     </script>
 </body>
 </html>
