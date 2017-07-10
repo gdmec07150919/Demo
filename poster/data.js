@@ -36,7 +36,6 @@ var dataStr = '1、img1<br><br>导演:黄吴丰<br>编剧:我是图片1<br><br><
  		caption: c[0].split('、')[1],
  		desc: c[1]
  	});
-  	console.log(data[i].img)
  }
 /*for(i=1;i < 15;i++){
     console.log(i+"、img"+i+"<br>\
